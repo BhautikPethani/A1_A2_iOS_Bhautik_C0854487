@@ -31,12 +31,49 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locationMnager.requestWhenInUseAuthorization()
         locationMnager.startUpdatingLocation()
         
+        singleTap()
+        
+    }
+
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
+//        print(locations.count)
+        let userLocation = locations[0]
+        
+        let latitude = userLocation.coordinate.latitude
+        let longitude = userLocation.coordinate.longitude
+        
+        displayLocation(latitude: latitude, longitude: longitude, title: "my location", subtitle: "you are here")
+    }
+    
+    @IBAction func goToToronto(_ sender: Any) {
         let latitude: CLLocationDegrees = 43.651070
         let longitude: CLLocationDegrees = -79.347015
         
         displayLocation(latitude: latitude, longitude: longitude, title: "Toronto", subtitle: "You are here")
     }
-
+    
+    func singleTap() {
+        let singleTap = UITapGestureRecognizer(target: self, action: #selector(dropPin));
+        singleTap.numberOfTapsRequired = 1;
+        map.addGestureRecognizer(singleTap);
+        
+    }
+    
+    @objc func dropPin(sender: UITapGestureRecognizer) {
+        
+        // add annotation
+        let touchPoint = sender.location(in: map)
+        let coordinate = map.convert(touchPoint, toCoordinateFrom: map)
+        let annotation = MKPointAnnotation()
+        annotation.title = "my destination"
+        annotation.coordinate = coordinate
+        map.addAnnotation(annotation)
+        
+        destination = coordinate
+        btnNavigation.isHidden = false
+    }
+    
     func displayLocation(latitude: CLLocationDegrees,
                          longitude: CLLocationDegrees,
                          title: String,
@@ -62,5 +99,37 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         map.addAnnotation(annotation)
     }
 
+}
+
+extension ViewController: MKMapViewDelegate {
+    
+    //MARK: - viewFor annotation method
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
+        if annotation is MKUserLocation {
+            return nil
+        }
+        
+        switch annotation.title {
+        case "my location":
+            let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "MyMarker")
+            annotationView.markerTintColor = UIColor.blue
+            return annotationView
+        case "my destination":
+            let annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
+            annotationView.animatesDrop = true
+            annotationView.pinTintColor = #colorLiteral(red: 0.2588235438, green: 0.7568627596, blue: 0.9686274529, alpha: 1)
+            return annotationView
+        case "my favorite":
+            let annotationView = map.dequeueReusableAnnotationView(withIdentifier: "customPin") ?? MKPinAnnotationView()
+            annotationView.image = UIImage(named: "ic_place_2x")
+            annotationView.canShowCallout = true
+            annotationView.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+            return annotationView
+        default:
+            return nil
+        }
+    }
+    
 }
 

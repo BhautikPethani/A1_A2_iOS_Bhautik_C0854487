@@ -33,6 +33,9 @@
                                     <constraint firstAttribute="height" constant="75" id="dfw-DZ-grz"/>
                                 </constraints>
                                 <state key="normal" title="Button" image="current_location-arrow"/>
+                                <connections>
+                                    <action selector="goToCurrentLocation:" destination="BYZ-38-t0r" eventType="touchUpInside" id="OL2-z5-ufC"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
