@@ -26,6 +26,9 @@
                                     <constraint firstAttribute="height" constant="78" id="LhG-ba-wJp"/>
                                 </constraints>
                                 <state key="normal" title="Button" image="navigation-arrow"/>
+                                <connections>
+                                    <action selector="drawRoute:" destination="BYZ-38-t0r" eventType="touchUpInside" id="u7j-xk-twE"/>
+                                </connections>
                             </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>

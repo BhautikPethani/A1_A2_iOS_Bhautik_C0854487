@@ -10,7 +10,6 @@ import MapKit
 
 class ViewController: UIViewController, CLLocationManagerDelegate {
 
-    @IBOutlet weak var btnCurrentLocation: UIButton!
     @IBOutlet weak var btnNavigation: UIButton!
     @IBOutlet weak var map: MKMapView!
     
@@ -58,6 +57,33 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 //
 //        displayLocation(latitude: latitude, longitude: longitude, title: "Current Location", subtitle: "you are here")
 //    }
+    
+    func routeBuilder(source: CLLocationCoordinate2D, destination: CLLocationCoordinate2D){
+        let sourcePlaceMark = MKPlacemark(coordinate: source);
+        let destinationPlaceMark = MKPlacemark(coordinate: destination);
+        let directionRequest = MKDirections.Request();
+        directionRequest.source = MKMapItem(placemark: sourcePlaceMark);
+        directionRequest.destination = MKMapItem(placemark: destinationPlaceMark);
+        directionRequest.transportType = .automobile;
+        let directions = MKDirections(request: directionRequest);
+        
+        directions.calculate { (response, error) in
+            guard let directionResponse = response else {return}
+            let route = directionResponse.routes[0]
+            self.map.addOverlay(route.polyline, level: .aboveRoads)
+            let rect = route.polyline.boundingMapRect
+            self.map.setVisibleMapRect(rect, edgePadding: UIEdgeInsets(top: 100, left: 100, bottom: 100, right: 100), animated: true)
+        }
+    }
+    
+    @IBAction func drawRoute(_ sender: UIButton) {
+        
+        map.removeOverlays(map.overlays)
+        routeBuilder(source: places[0].getCoordinates(), destination: places[1].getCoordinates());
+        routeBuilder(source: places[1].getCoordinates(), destination: places[2].getCoordinates());
+        routeBuilder(source: places[2].getCoordinates(), destination: places[0].getCoordinates());
+    }
+
     
     func addAnnotationsForPlaces() {
         map.addAnnotations(places)
@@ -148,28 +174,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             
             annotation.coordinate = coordinate
             map.addAnnotation(annotation)
-            //addAnnotationsForPlaces()
-            
-            
-//            destination = coordinate
-//            btnNavigation.isHidden = false
-            
             if(counter==2){
                 addPolyline();
                 places.append(places[0]);
-                addPolyline();
-                addPolygon();
+                btnNavigation.isHidden = false;
             }
             counter+=1;
             addPolyline();
             addPolygon();
         }else{
-            var temp = places[0];
+            let temp = places[0];
             places.removeAll();
             removePolyline();
             removePin();
             counter = 1;
-            
+            places.append(temp);
             displayLocation(latitude: temp.getCoordinates().latitude, longitude: temp.getCoordinates().longitude, title: temp.getName(), subtitle: "")
         }
         
