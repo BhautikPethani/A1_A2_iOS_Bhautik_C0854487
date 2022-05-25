@@ -125,7 +125,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         return newLoc
     }
     
-    
     @objc func dropPin(sender: UITapGestureRecognizer) {
         
         if(counter<=2){
@@ -143,6 +142,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             }else{
                 annotation.title = "C";
                 places.append(Place(name: "C", coordinate: coordinate));
+                distanceTitle = "Distance Between B to C";
+                distanceFigure = distanceBetweenTwoCoordinates(origin: places[1].getCoordinates(), destination: places[2].getCoordinates()) + " KMs";
             }
             
             annotation.coordinate = coordinate
@@ -163,10 +164,13 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             addPolyline();
             addPolygon();
         }else{
+            var temp = places[0];
             places.removeAll();
             removePolyline();
             removePin();
-            counter = 0;
+            counter = 1;
+            
+            displayLocation(latitude: temp.getCoordinates().latitude, longitude: temp.getCoordinates().longitude, title: temp.getName(), subtitle: "")
         }
         
     }
