@@ -13,6 +13,7 @@
 		ED661AA9283D87DF003433D4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ED661AA7283D87DF003433D4 /* Main.storyboard */; };
 		ED661AAB283D87E0003433D4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ED661AAA283D87E0003433D4 /* Assets.xcassets */; };
 		ED661AAE283D87E0003433D4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = ED661AAC283D87E0003433D4 /* LaunchScreen.storyboard */; };
+		ED661AB8283DAB15003433D4 /* Place.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED661AB7283DAB15003433D4 /* Place.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		ED661AAA283D87E0003433D4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		ED661AAD283D87E0003433D4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED661AAF283D87E0003433D4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ED661AB7283DAB15003433D4 /* Place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +63,7 @@
 				ED661AA5283D87DF003433D4 /* ViewController.swift */,
 				ED661AA7283D87DF003433D4 /* Main.storyboard */,
 				ED661AAA283D87E0003433D4 /* Assets.xcassets */,
+				ED661AB7283DAB15003433D4 /* Place.swift */,
 				ED661AAC283D87E0003433D4 /* LaunchScreen.storyboard */,
 				ED661AAF283D87E0003433D4 /* Info.plist */,
 			);
@@ -141,6 +144,7 @@
 				ED661AA6283D87DF003433D4 /* ViewController.swift in Sources */,
 				ED661AA2283D87DF003433D4 /* AppDelegate.swift in Sources */,
 				ED661AA4283D87DF003433D4 /* SceneDelegate.swift in Sources */,
+				ED661AB8283DAB15003433D4 /* Place.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

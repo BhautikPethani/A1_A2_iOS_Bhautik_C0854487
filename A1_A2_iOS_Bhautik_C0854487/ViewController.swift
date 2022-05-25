@@ -17,6 +17,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var locationMnager = CLLocationManager()
     var destination: CLLocationCoordinate2D!
     
+    var city = ["A","B","C"];
+    var places = [Place]();
+    var counter = 0;
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -31,26 +35,58 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         locationMnager.requestWhenInUseAuthorization()
         locationMnager.startUpdatingLocation()
         
+        let latitude: CLLocationDegrees = 43.64;
+        let longitude: CLLocationDegrees = -79.38;
+        
+        displayLocation(latitude: latitude, longitude: longitude, title: "Toronto City", subtitle: "You are here");
         singleTap()
+        
+        map.delegate = self
         
     }
 
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+//    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+//
+////        print(locations.count)
+//        let userLocation = locations[0]
+//
+//        let latitude = userLocation.coordinate.latitude
+//        let longitude = userLocation.coordinate.longitude
+//
+//        displayLocation(latitude: latitude, longitude: longitude, title: "Current Location", subtitle: "you are here")
+//    }
+    
+    func addAnnotationsForPlaces() {
+        map.addAnnotations(places)
         
-//        print(locations.count)
-        let userLocation = locations[0]
-        
-        let latitude = userLocation.coordinate.latitude
-        let longitude = userLocation.coordinate.longitude
-        
-        displayLocation(latitude: latitude, longitude: longitude, title: "my location", subtitle: "you are here")
+        let overlays = places.map {MKCircle(center: $0.coordinate, radius: 2000)}
+        map.addOverlays(overlays)
+    }
+    
+    func addPolyline() {
+        let coordinates = places.map {$0.coordinate}
+        let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+        map.addOverlay(polyline)
+    }
+    
+    func addPolygon() {
+        let coordinates = places.map {$0.coordinate}
+        let polygon = MKPolygon(coordinates: coordinates, count: coordinates.count)
+        map.addOverlay(polygon)
+    }
+    
+    func removePolyline() {
+        for overlay in map.overlays {
+            map.removeOverlay(overlay)
+        }
+        //map.removeOverlays(map.overlays)
     }
     
     @IBAction func goToToronto(_ sender: Any) {
-        let latitude: CLLocationDegrees = 43.651070
-        let longitude: CLLocationDegrees = -79.347015
+        let latitude: CLLocationDegrees = 43.651070;
+        let longitude: CLLocationDegrees = -79.347015;
         
-        displayLocation(latitude: latitude, longitude: longitude, title: "Toronto", subtitle: "You are here")
+        displayLocation(latitude: latitude, longitude: longitude, title: "Toronto", subtitle: "You are here");
     }
     
     func singleTap() {
@@ -60,20 +96,60 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
     }
     
-    @objc func dropPin(sender: UITapGestureRecognizer) {
+    func removePin() {
+        for annotation in map.annotations {
+            map.removeAnnotation(annotation)
+        }
+        map.removeAnnotations(map.annotations)
         
-        // add annotation
-        let touchPoint = sender.location(in: map)
-        let coordinate = map.convert(touchPoint, toCoordinateFrom: map)
-        let annotation = MKPointAnnotation()
-        annotation.title = "my destination"
-        annotation.coordinate = coordinate
-        map.addAnnotation(annotation)
+        let latitude: CLLocationDegrees = 43.64;
+        let longitude: CLLocationDegrees = -79.38;
         
-        destination = coordinate
-        btnNavigation.isHidden = false
+        displayLocation(latitude: latitude, longitude: longitude, title: "Toronto City", subtitle: "You are here");
+        singleTap()
     }
     
+    @objc func dropPin(sender: UITapGestureRecognizer) {
+        
+        if(counter<=2){
+            let touchPoint = sender.location(in: map)
+            let coordinate = map.convert(touchPoint, toCoordinateFrom: map)
+            let annotation = MKPointAnnotation()
+            if(counter==0){
+                annotation.title = "A";
+                places.append(Place(name: "A", coordinate: coordinate));
+            }else if(counter==1){
+                annotation.title = "B";
+                places.append(Place(name: "B", coordinate: coordinate));
+            }else{
+                annotation.title = "C";
+                places.append(Place(name: "C", coordinate: coordinate));
+            }
+            
+            annotation.coordinate = coordinate
+            map.addAnnotation(annotation)
+            //addAnnotationsForPlaces()
+            
+            
+//            destination = coordinate
+//            btnNavigation.isHidden = false
+            if(counter==2){
+                addPolyline();
+                places.append(places[0]);
+                addPolyline();
+                addPolygon();
+            }
+            counter+=1;
+            addPolyline();
+            addPolygon();
+        }else{
+            places.removeAll();
+            removePolyline();
+            removePin();
+            counter = 0;
+        }
+        
+    }
     func displayLocation(latitude: CLLocationDegrees,
                          longitude: CLLocationDegrees,
                          title: String,
@@ -102,7 +178,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 }
 
 extension ViewController: MKMapViewDelegate {
-    
     //MARK: - viewFor annotation method
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         
@@ -111,25 +186,51 @@ extension ViewController: MKMapViewDelegate {
         }
         
         switch annotation.title {
-        case "my location":
+        case "Current Location":
             let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "MyMarker")
             annotationView.markerTintColor = UIColor.blue
             return annotationView
-        case "my destination":
-            let annotationView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
-            annotationView.animatesDrop = true
-            annotationView.pinTintColor = #colorLiteral(red: 0.2588235438, green: 0.7568627596, blue: 0.9686274529, alpha: 1)
+        case "Toronto City":
+            let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "MyMarker")
+            annotationView.markerTintColor = UIColor.blue
             return annotationView
-        case "my favorite":
-            let annotationView = map.dequeueReusableAnnotationView(withIdentifier: "customPin") ?? MKPinAnnotationView()
-            annotationView.image = UIImage(named: "ic_place_2x")
-            annotationView.canShowCallout = true
-            annotationView.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
+        case "A":
+            let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
+            annotationView.markerTintColor = #colorLiteral(red: 0, green: 0, blue: 0, alpha: 1)
+            return annotationView
+        case "B":
+            let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
+            annotationView.markerTintColor = #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)
+            return annotationView
+        case "C":
+            let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
+            annotationView.markerTintColor = #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)
             return annotationView
         default:
             return nil
         }
     }
     
+    func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+        if overlay is MKCircle {
+            let rendrer = MKCircleRenderer(overlay: overlay)
+            rendrer.fillColor = UIColor.green.withAlphaComponent(0.5)
+            rendrer.strokeColor = UIColor.green
+            rendrer.lineWidth = 2
+            return rendrer
+        } else if overlay is MKPolyline {
+            let rendrer = MKPolylineRenderer(overlay: overlay)
+            rendrer.strokeColor = UIColor.green.withAlphaComponent(0.5)
+            rendrer.lineWidth = 3
+            return rendrer
+        } else if overlay is MKPolygon {
+            let rendrer = MKPolygonRenderer(overlay: overlay)
+            rendrer.fillColor = UIColor.green.withAlphaComponent(0.5)
+            rendrer.strokeColor = UIColor.yellow
+            rendrer.lineWidth = 2
+            return rendrer
+        }
+        return MKOverlayRenderer()
+    }
 }
 
