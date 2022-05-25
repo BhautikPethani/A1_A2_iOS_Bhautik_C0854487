@@ -21,7 +21,7 @@ class Place: NSObject, MKAnnotation {
         return self.name;
     }
     
-    func getName() -> CLLocationCoordinate2D{
+    func getCoordinates() -> CLLocationCoordinate2D{
         return self.coordinate;
     }
 }

@@ -21,6 +21,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var places = [Place]();
     var counter = 0;
     
+    var distanceFigure = "";
+    var distanceTitle = "";
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
@@ -109,6 +112,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         singleTap()
     }
     
+    func distanceBetweenTwoCoordinates (origin: CLLocationCoordinate2D, destination: CLLocationCoordinate2D) -> String {
+        
+        let distance = (convertToCLLocation(coord: destination).distance(from: convertToCLLocation(coord: origin)))/1000;
+        return String(format: "%.2f", distance);
+    }
+    
+    func convertToCLLocation(coord: CLLocationCoordinate2D) -> CLLocation{
+        let getLat: CLLocationDegrees = coord.latitude
+        let getLon: CLLocationDegrees = coord.longitude
+        let newLoc: CLLocation =  CLLocation(latitude: getLat, longitude: getLon)
+        return newLoc
+    }
+    
+    
     @objc func dropPin(sender: UITapGestureRecognizer) {
         
         if(counter<=2){
@@ -121,6 +138,8 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             }else if(counter==1){
                 annotation.title = "B";
                 places.append(Place(name: "B", coordinate: coordinate));
+                distanceTitle = "Distance Between A to B";
+                distanceFigure = distanceBetweenTwoCoordinates(origin: places[0].getCoordinates(), destination: places[1].getCoordinates()) + " KMs";
             }else{
                 annotation.title = "C";
                 places.append(Place(name: "C", coordinate: coordinate));
@@ -133,6 +152,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             
 //            destination = coordinate
 //            btnNavigation.isHidden = false
+            
             if(counter==2){
                 addPolyline();
                 places.append(places[0]);
@@ -201,14 +221,25 @@ extension ViewController: MKMapViewDelegate {
         case "B":
             let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
             annotationView.markerTintColor = #colorLiteral(red: 0.9607843161, green: 0.7058823705, blue: 0.200000003, alpha: 1)
+            annotationView.canShowCallout = true
+            annotationView.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
             return annotationView
         case "C":
             let annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "droppablePin")
             annotationView.markerTintColor = #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)
+            annotationView.canShowCallout = true
+            annotationView.rightCalloutAccessoryView = UIButton(type: .detailDisclosure)
             return annotationView
         default:
             return nil
         }
+    }
+    
+    func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+        let alertController = UIAlertController(title: distanceTitle, message: distanceFigure, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "OK", style: .cancel, handler: nil)
+        alertController.addAction(cancelAction)
+        present(alertController, animated: true, completion: nil)
     }
     
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
